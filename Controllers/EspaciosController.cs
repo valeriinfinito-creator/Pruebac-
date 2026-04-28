@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using DeportivoApp.Models;
 using DeportivoApp.Services.Interfaces;
+using DeportivoApp.ViewModels;
 
 namespace DeportivoApp.Controllers
 {
@@ -13,74 +14,113 @@ namespace DeportivoApp.Controllers
             _espacioService = espacioService;
         }
 
-        // GET: Espacios
-        public async Task<IActionResult> Index()
+        // GET: Index
+        public async Task<IActionResult> Index(string? tipo)
         {
             var espacios = await _espacioService.GetAllAsync();
+
+            var tipos = espacios
+                .Select(e => e.Tipo)
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Distinct()
+                .OrderBy(t => t)
+                .ToList();
+
+            ViewBag.Tipos = tipos;
+            ViewBag.TipoSeleccionado = tipo;
+
+            if (!string.IsNullOrWhiteSpace(tipo))
+            {
+                espacios = espacios
+                    .Where(e => string.Equals(e.Tipo, tipo, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
             return View(espacios);
         }
 
-        // GET: Espacios/Details/5
-        public async Task<IActionResult> Details(int id)
-        {
-            var espacio = await _espacioService.GetByIdAsync(id);
-            if (espacio == null) return NotFound();
-
-            return View(espacio);
-        }
-
-        // GET: Espacios/Create
+        // GET: Create
         public IActionResult Create()
         {
-            return View();
+            var model = new EspacioCreateViewModel
+            {
+                Estado = "Disponible"
+            };
+
+            return View(model);
         }
 
-        // POST: Espacios/Create
+        // POST: Create
         [HttpPost]
-        public async Task<IActionResult> Create(Espacio espacio)
+        public async Task<IActionResult> Create(EspacioCreateViewModel model)
         {
             if (!ModelState.IsValid)
-                return View(espacio);
+                return View(model);
+
+            var espacio = new Espacio
+            {
+                Nombre = model.Nombre,
+                Tipo = model.Tipo,
+                Capacidad = model.Capacidad,
+                Estado = model.Estado
+            };
 
             var result = await _espacioService.CreateAsync(espacio);
 
             if (!result.Success)
             {
                 ModelState.AddModelError("", result.Message);
-                return View(espacio);
+
+                return View(model);
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Espacios/Edit/5
+        // GET: Edit
         public async Task<IActionResult> Edit(int id)
         {
             var espacio = await _espacioService.GetByIdAsync(id);
             if (espacio == null) return NotFound();
 
-            return View(espacio);
+            var model = new EspacioCreateViewModel
+            {
+                Id = espacio.Id,
+                Nombre = espacio.Nombre,
+                Tipo = espacio.Tipo,
+                Capacidad = espacio.Capacidad,
+                Estado = espacio.Estado
+            };
+
+            return View(model);
         }
 
-        // POST: Espacios/Edit
+        // POST: Edit
         [HttpPost]
-        public async Task<IActionResult> Edit(Espacio espacio)
+        public async Task<IActionResult> Edit(EspacioCreateViewModel model)
         {
             if (!ModelState.IsValid)
-                return View(espacio);
+                return View(model);
+
+            var espacio = await _espacioService.GetByIdAsync(model.Id);
+            if (espacio == null) return NotFound();
+
+            espacio.Nombre = model.Nombre;
+            espacio.Tipo = model.Tipo;
+            espacio.Capacidad = model.Capacidad;
+            espacio.Estado = model.Estado;
 
             var result = await _espacioService.UpdateAsync(espacio);
-
             if (!result.Success)
             {
                 ModelState.AddModelError("", result.Message);
-                return View(espacio);
+                return View(model);
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Espacios/Delete/5
+        // DELETE
         public async Task<IActionResult> Delete(int id)
         {
             var espacio = await _espacioService.GetByIdAsync(id);
@@ -89,11 +129,12 @@ namespace DeportivoApp.Controllers
             return View(espacio);
         }
 
-        // POST: Espacios/Delete
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Espacio espacio)
         {
-            await _espacioService.DeleteAsync(id);
+            var ok = await _espacioService.DeleteAsync(espacio.Id);
+            if (!ok) return NotFound();
             return RedirectToAction(nameof(Index));
         }
     }

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/cohorte5/Documentos/DeportivoApp/DeportivoApp.csproj": {}
+    "C:\\Users\\ADMIN\\RiderProjects\\Pruebac-\\DeportivoApp.csproj": {}
   },
   "projects": {
-    "/home/cohorte5/Documentos/DeportivoApp/DeportivoApp.csproj": {
+    "C:\\Users\\ADMIN\\RiderProjects\\Pruebac-\\DeportivoApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/cohorte5/Documentos/DeportivoApp/DeportivoApp.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\RiderProjects\\Pruebac-\\DeportivoApp.csproj",
         "projectName": "DeportivoApp",
-        "projectPath": "/home/cohorte5/Documentos/DeportivoApp/DeportivoApp.csproj",
-        "packagesPath": "/home/cohorte5/.nuget/packages/",
-        "outputPath": "/home/cohorte5/Documentos/DeportivoApp/obj/",
+        "projectPath": "C:\\Users\\ADMIN\\RiderProjects\\Pruebac-\\DeportivoApp.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ADMIN\\RiderProjects\\Pruebac-\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/cohorte5/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -38,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -80,15 +80,19 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.15, 8.0.15]"
+              "version": "[8.0.25, 8.0.25]"
             },
             {
-              "name": "Microsoft.NETCore.App.Host.linux-x64",
-              "version": "[8.0.15, 8.0.15]"
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.25, 8.0.25]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.15, 8.0.15]"
+              "version": "[8.0.25, 8.0.25]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
             }
           ],
           "frameworkReferences": {
@@ -99,7 +103,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

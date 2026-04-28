@@ -35,7 +35,7 @@ public class NotificacionService : INotificacionService
                 reserva.Usuario.Email,
                 reserva.Usuario.Nombre,
                 reserva.Espacio.Nombre,
-                reserva.Espacio.HoraInicio   
+                reserva.Fecha.Date.Add(reserva.HoraInicio)
             );
         }
         catch (Exception ex)

@@ -43,7 +43,7 @@ public class EmailHelper
                     <p>Tu reserva ha sido asignada exitosamente en <b>Deportivo App</b>.</p>
                 <hr>
                     <p><b>Espacio:</b> {nombreEspacio}</p>
-                    <p><b>📅 Fecha:</b> {fechaInicio}</p>
+                    <p><b>📅 Fecha:</b> {fechaInicio:dd/MM/yyyy HH:mm}</p>
 
                 <hr>
                     <p style='color:gray;font-size:12px;'>

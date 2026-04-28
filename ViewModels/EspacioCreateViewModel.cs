@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace DeportivoApp.ViewModels
 {
@@ -6,16 +6,15 @@ namespace DeportivoApp.ViewModels
     {
         public int Id { get; set; }
 
-        public int UsuarioId { get; set; }
+        [Required]
+        public string Nombre { get; set; } = string.Empty;
 
-        public DateTime Fecha { get; set; }
+        [Required]
+        public string Tipo { get; set; } = string.Empty;
 
-        public TimeSpan HoraInicio { get; set; }
+        [Range(1, int.MaxValue)]
+        public int Capacidad { get; set; }
 
-        public TimeSpan HoraFin { get; set; }
-
-        public string Estado { get; set; }
-
-        public List<SelectListItem> Usuarios { get; set; } = new();
+        public string Estado { get; set; } = string.Empty;
     }
 }

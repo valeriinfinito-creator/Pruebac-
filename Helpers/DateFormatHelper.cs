@@ -9,13 +9,13 @@ namespace VeterinariaApp.Helpers
         }
 
         // Validar rango de horas
-        public static bool EsRangoValido(DateTime inicio, DateTime fin)
+        public static bool EsRangoValido(TimeSpan inicio, TimeSpan fin)
         {
             return fin > inicio;
         }
 
         // Validar cruce de horarios
-        public static bool HayCruce(DateTime inicio1, DateTime fin1, DateTime inicio2, DateTime fin2)
+        public static bool HayCruce(TimeSpan inicio1, TimeSpan fin1, TimeSpan inicio2, TimeSpan fin2)
         {
             return inicio1 < fin2 && fin1 > inicio2;
         }

@@ -1,7 +1,7 @@
 @model DeportivoApp.ViewModels.EspacioCreateViewModel
 
 @{
-    ViewData["Title"] = "Nuevo Espacio";
+ViewData["Title"] = "Nuevo Espacio";
 }
 
 <h2>➕ Nuevo Espacio</h2>
@@ -9,28 +9,31 @@
 <div asp-validation-summary="All" class="text-danger"></div>
 
 <form asp-action="Create" method="post" class="card card-wow p-4">
+    
+    <div class="form-group">
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
 
-    <div class="mb-3">
-        <label>Usuario</label>
-        <select asp-for="UsuarioId"
-                asp-items="Model.Usuarios"
-                class="form-select">
+    <div class="form-group">
+        <label asp-for="Tipo"></label>
+        <input asp-for="Tipo" class="form-control" />
+        <span asp-validation-for="Tipo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Capacidad"></label>
+        <input asp-for="Capacidad" type="number" min="1" class="form-control" />
+        <span asp-validation-for="Capacidad" class="text-danger"></span>
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="Estado"></label>
+        <select asp-for="Estado" class="form-control">
+            <option value="Disponible">Disponible</option>
+            <option value="Mantenimiento">Mantenimiento</option>
         </select>
-    </div>
-
-    <div class="mb-3">
-        <label>Fecha</label>
-        <input asp-for="Fecha" type="date" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Hora Inicio</label>
-        <input asp-for="HoraInicio" type="time" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Hora Fin</label>
-        <input asp-for="HoraFin" type="time" class="form-control" />
     </div>
 
     <button type="submit" class="btn btn-wow">

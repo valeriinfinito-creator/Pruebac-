@@ -1,21 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using DeportivoApp.Data;
-using DeportivoApp.Helpers;
 using DeportivoApp.Models;
 using DeportivoApp.Services.Interfaces;
-using DeportivoApp.Validators; 
+using DeportivoApp.Validators;
 
 namespace DeportivoApp.Services.Implementations
 {
     public class ReservaService : IReservaService
     {
         private readonly MySqlDBContext _context;
-        private readonly EmailHelper _email;
+        private readonly INotificacionService _notificacionService;
 
-        public ReservaService(MySqlDBContext context, EmailHelper email)
+        public ReservaService(MySqlDBContext context, INotificacionService notificacionService)
         {
             _context = context;
-            _email = email;
+            _notificacionService = notificacionService;
         }
 
         // CREATE
@@ -28,11 +27,8 @@ namespace DeportivoApp.Services.Implementations
                 if (!validacion.IsValid)
                     return (false, validacion.Message);
 
-                if (await TieneReservasActivasAsync(reserva.UsuarioId))
-                    return (false, "El usuario ya tiene 2 reservas activas");
-
-                if (await EstaBloqueadaAsync(reserva.UsuarioId))
-                    return (false, "Usuario bloqueado por inasistencias");
+                if (EsFechaHoraPasada(reserva.Fecha, reserva.HoraInicio))
+                    return (false, "No se pueden crear reservas en fechas u horas pasadas");
 
                 if (await HayConflictoHorarioAsync(
                     reserva.UsuarioId,
@@ -41,12 +37,30 @@ namespace DeportivoApp.Services.Implementations
                     reserva.HoraFin))
                     return (false, "El usuario ya tiene una reserva en ese horario");
 
+                if (await HayConflictoEspacioAsync(
+                    reserva.EspacioId,
+                    reserva.Fecha,
+                    reserva.HoraInicio,
+                    reserva.HoraFin))
+                    return (false, "El espacio ya tiene una reserva en ese rango de horario");
+
                 reserva.Estado = "Programada";
 
                 await _context.Reservas.AddAsync(reserva);
                 await _context.SaveChangesAsync();
 
-                return (true, "Reserva creada correctamente");
+                var mensaje = "Reserva creada correctamente";
+
+                try
+                {
+                    await _notificacionService.EnviarConfirmacionReservaAsync(reserva.Id);
+                }
+                catch
+                {
+                    mensaje = "Reserva creada correctamente (no se pudo enviar el correo)";
+                }
+
+                return (true, mensaje);
             }
             catch (Exception ex)
             {
@@ -70,7 +84,7 @@ namespace DeportivoApp.Services.Implementations
         }
 
         // GET BY ID
-        public async Task<Reserva?> GetByIdAsync(int id) 
+        public async Task<Reserva?> GetByIdAsync(int id)
         {
             return await _context.Reservas
                 .Include(r => r.Espacio)
@@ -84,6 +98,29 @@ namespace DeportivoApp.Services.Implementations
             var existente = await _context.Reservas.FindAsync(reserva.Id);
             if (existente == null)
                 return (false, "Reserva no encontrada");
+
+            var validacion = ReservaValidator.Validar(reserva);
+            if (!validacion.IsValid)
+                return (false, validacion.Message);
+
+            if (EsFechaHoraPasada(reserva.Fecha, reserva.HoraInicio))
+                return (false, "No se pueden dejar reservas en fechas u horas pasadas");
+
+            if (await HayConflictoHorarioAsync(
+                    reserva.UsuarioId,
+                    reserva.Fecha,
+                    reserva.HoraInicio,
+                    reserva.HoraFin,
+                    reserva.Id))
+                return (false, "El usuario ya tiene una reserva en ese horario");
+
+            if (await HayConflictoEspacioAsync(
+                    reserva.EspacioId,
+                    reserva.Fecha,
+                    reserva.HoraInicio,
+                    reserva.HoraFin,
+                    reserva.Id))
+                return (false, "El espacio ya tiene una reserva en ese rango de horario");
 
             _context.Entry(existente).CurrentValues.SetValues(reserva);
             await _context.SaveChangesAsync();
@@ -113,47 +150,47 @@ namespace DeportivoApp.Services.Implementations
             return true;
         }
 
-        // BLOQUEO
-        public async Task<bool> EstaBloqueadaAsync(int usuarioId)
-        {
-            var inasistencias = await ContarInasistenciasAsync(usuarioId);
-            return inasistencias >= 3;
-        }
-
-        public async Task<int> ContarInasistenciasAsync(int usuarioId)
-        {
-            return await _context.Reservas
-                .CountAsync(r => r.UsuarioId == usuarioId &&
-                                 r.Estado == "No asistió");
-        }
-
         // VALIDAR CONFLICTO
         public async Task<bool> HayConflictoHorarioAsync(
             int usuarioId,
             DateTime fecha,
-            DateTime inicio,
-            DateTime fin,
+            TimeSpan inicio,
+            TimeSpan fin,
             int? reservaId = null)
         {
             return await _context.Reservas.AnyAsync(r =>
                 r.UsuarioId == usuarioId &&
                 r.Fecha.Date == fecha.Date &&
                 r.Id != reservaId &&
+                r.Estado == "Programada" &&
                 inicio < r.HoraFin &&
                 fin > r.HoraInicio
             );
         }
 
-        // VALIDAR LIMITE
-        public async Task<bool> TieneReservasActivasAsync(int usuarioId)
+        private async Task<bool> HayConflictoEspacioAsync(
+            int espacioId,
+            DateTime fecha,
+            TimeSpan inicio,
+            TimeSpan fin,
+            int? reservaId = null)
         {
-            var count = await _context.Reservas
-                .CountAsync(r => r.UsuarioId == usuarioId &&
-                                 r.Estado == "Programada");
+            return await _context.Reservas.AnyAsync(r =>
+                r.EspacioId == espacioId &&
+                r.Fecha.Date == fecha.Date &&
+                r.Id != reservaId &&
+                r.Estado == "Programada" &&
+                inicio < r.HoraFin &&
+                fin > r.HoraInicio
+            );
+        }
 
-            return count >= 2;
+        private static bool EsFechaHoraPasada(DateTime fecha, TimeSpan horaInicio)
+        {
+            var inicio = fecha.Date.Add(horaInicio);
+            return inicio < DateTime.Now;
         }
     }
 }
-        
+
 

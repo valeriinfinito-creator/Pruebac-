@@ -9,8 +9,11 @@ namespace DeportivoApp.Validators
             if (string.IsNullOrWhiteSpace(espacio.Nombre))
                 return (false, "El nombre es obligatorio");
 
-            if (espacio.HoraInicio >= espacio.HoraFin)
-                return (false, "Horario inválido");
+            if (string.IsNullOrWhiteSpace(espacio.Tipo))
+                return (false, "El tipo es obligatorio");
+
+            if (espacio.Capacidad <= 0)
+                return (false, "La capacidad debe ser mayor a 0");
 
             return (true, "OK");
         }

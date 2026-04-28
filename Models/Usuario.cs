@@ -20,7 +20,6 @@ public class Usuario
 
     // RELACIONES
     public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
-    public ICollection<Espacio> Espacios { get; set; } = new List<Espacio>();
 
     // 🔧 SOLUCIÓN ERROR NombreCompleto
     public string NombreCompleto => Nombre;

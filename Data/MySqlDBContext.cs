@@ -26,14 +26,18 @@ namespace DeportivoApp.Data
                 .HasIndex(u => u.Email)
                 .IsUnique();
 
-            // Usuario → Espacios
             modelBuilder.Entity<Espacio>()
-                .HasOne(e => e.Usuario)
-                .WithMany(u => u.Espacios)
-                .HasForeignKey(e => e.UsuarioId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .Property(e => e.Nombre)
+                .HasMaxLength(191);
 
-            // Reserva → Usuario
+            modelBuilder.Entity<Espacio>()
+                .Property(e => e.Tipo)
+                .HasMaxLength(191);
+
+            modelBuilder.Entity<Espacio>()
+                .HasIndex(e => new { e.Nombre, e.Tipo })
+                .IsUnique();
+
             modelBuilder.Entity<Reserva>()
                 .HasOne(r => r.Usuario)
                 .WithMany(u => u.Reservas)

@@ -17,10 +17,10 @@ namespace DeportivoApp.ViewModels
         public DateTime Fecha { get; set; }
 
         [Required]
-        public DateTime HoraInicio { get; set; }
+        public TimeSpan HoraInicio { get; set; }
 
         [Required]
-        public DateTime HoraFin { get; set; }
+        public TimeSpan HoraFin { get; set; }
 
         public string Estado { get; set; } = "Programada";
 

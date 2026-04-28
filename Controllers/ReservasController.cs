@@ -11,25 +11,40 @@ public class ReservasController : Controller
     private readonly IReservaService _reservaService;
     private readonly IEspacioService _espacioService;
     private readonly IUsuarioService _usuarioService;
-    private readonly INotificacionService _notificacionService;
 
     public ReservasController(
         IReservaService reservaService,
         IEspacioService espacioService,
-        IUsuarioService usuarioService,
-        INotificacionService notificacionService
+        IUsuarioService usuarioService
     )
     {
         _reservaService = reservaService;
         _espacioService = espacioService;
         _usuarioService = usuarioService;
-        _notificacionService = notificacionService;
     }
 
     // INDEX
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int? usuarioId, int? espacioId)
     {
         var reservas = await _reservaService.GetAllAsync();
+
+        var usuarios = await _usuarioService.GetAllAsync();
+        var espacios = await _espacioService.GetAllAsync();
+
+        ViewBag.Usuarios = usuarios
+            .Select(x => new SelectListItem(x.NombreCompleto, x.Id.ToString(), usuarioId == x.Id))
+            .ToList();
+
+        ViewBag.Espacios = espacios
+            .Select(x => new SelectListItem(x.Nombre, x.Id.ToString(), espacioId == x.Id))
+            .ToList();
+
+        if (usuarioId.HasValue)
+            reservas = reservas.Where(r => r.UsuarioId == usuarioId.Value).ToList();
+
+        if (espacioId.HasValue)
+            reservas = reservas.Where(r => r.EspacioId == espacioId.Value).ToList();
+
         return View(reservas);
     }
 
@@ -128,10 +143,39 @@ public class ReservasController : Controller
     // DELETE
     public async Task<IActionResult> Delete(int id)
     {
-        var ok = await _reservaService.DeleteAsync(id);
+        var reserva = await _reservaService.GetByIdAsync(id);
+        if (reserva == null) return NotFound();
+        return View(reserva);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(Reserva reserva)
+    {
+        var ok = await _reservaService.DeleteAsync(reserva.Id);
         if (!ok) return NotFound();
 
         TempData["Ok"] = "Reserva eliminada";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancelar(int id)
+    {
+        var ok = await _reservaService.CambiarEstadoAsync(id, "Cancelada");
+        if (!ok) return NotFound();
+        TempData["Ok"] = "Reserva cancelada";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Finalizar(int id)
+    {
+        var ok = await _reservaService.CambiarEstadoAsync(id, "Finalizada");
+        if (!ok) return NotFound();
+        TempData["Ok"] = "Reserva finalizada";
         return RedirectToAction(nameof(Index));
     }
 

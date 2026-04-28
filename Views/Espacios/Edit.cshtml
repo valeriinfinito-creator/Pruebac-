@@ -11,35 +11,28 @@
     <input type="hidden" asp-for="Id" />
 
     <div class="mb-3">
-        <label>Usuario</label>
-        <select asp-for="UsuarioId"
-                asp-items="Model.Usuarios"
-                class="form-select">
-        </select>
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label>Fecha</label>
-        <input asp-for="Fecha" type="date" class="form-control" />
+        <label asp-for="Tipo"></label>
+        <input asp-for="Tipo" class="form-control" />
+        <span asp-validation-for="Tipo" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label>Hora Inicio</label>
-        <input asp-for="HoraInicio" type="time" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Hora Fin</label>
-        <input asp-for="HoraFin" type="time" class="form-control" />
+        <label asp-for="Capacidad"></label>
+        <input asp-for="Capacidad" type="number" min="1" class="form-control" />
+        <span asp-validation-for="Capacidad" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label>Estado</label>
         <select asp-for="Estado" class="form-select">
-            <option>Programada</option>
-            <option>Cancelada</option>
-            <option>Atendida</option>
-            <option>No asistió</option>
+            <option>Disponible</option>
+            <option>Mantenimiento</option>
         </select>
     </div>
 

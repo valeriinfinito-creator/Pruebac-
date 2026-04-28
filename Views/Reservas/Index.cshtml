@@ -10,6 +10,25 @@
     ➕ Nueva Reserva
 </a>
 
+<form method="get" class="mb-3 d-flex gap-2 flex-wrap">
+    <select name="usuarioId" class="form-select" style="max-width: 280px;">
+        <option value="">-- Todos los usuarios --</option>
+        @foreach (var u in (IEnumerable<SelectListItem>)(ViewBag.Usuarios ?? new List<SelectListItem>()))
+        {
+            <option value="@u.Value" selected="@u.Selected">@u.Text</option>
+        }
+    </select>
+    <select name="espacioId" class="form-select" style="max-width: 280px;">
+        <option value="">-- Todos los espacios --</option>
+        @foreach (var e in (IEnumerable<SelectListItem>)(ViewBag.Espacios ?? new List<SelectListItem>()))
+        {
+            <option value="@e.Value" selected="@e.Selected">@e.Text</option>
+        }
+    </select>
+    <button class="btn btn-primary" type="submit">Filtrar</button>
+    <a class="btn btn-secondary" asp-action="Index">Limpiar</a>
+</form>
+
 <table class="table table-hover shadow-sm bg-white rounded">
 
     <thead class="table-success">
@@ -31,7 +50,7 @@
             <td>@item.Usuario?.Nombre</td>
             <td>@item.Espacio?.Nombre</td>
             <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
-            <td>@item.HoraInicio.ToString("HH:mm") - @item.HoraFin.ToString("HH:mm")</td>
+            <td>@item.HoraInicio.ToString(@"hh\:mm") - @item.HoraFin.ToString(@"hh\:mm")</td>
 
             <td>
                 <span class="badge bg-info">@item.Estado</span>
@@ -50,6 +69,16 @@
                    asp-route-id="@item.Id">
                     Eliminar
                 </a>
+
+                @if (item.Estado == "Programada")
+                {
+                    <form asp-action="Cancelar" asp-route-id="@item.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-warning">Cancelar</button>
+                    </form>
+                    <form asp-action="Finalizar" asp-route-id="@item.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-success">Finalizar</button>
+                    </form>
+                }
 
             </td>
 

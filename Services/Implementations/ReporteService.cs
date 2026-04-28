@@ -31,7 +31,8 @@ namespace DeportivoApp.Services.Implementations
         {
             return await _context.Reservas
                 .Include(r => r.Espacio)
-                .GroupBy(r => r.Espacio.Nombre)
+                .Where(r => r.Espacio != null)
+                .GroupBy(r => r.Espacio!.Nombre)
                 .Select(g => new ReporteViewModel
                 {
                     Nombre = g.Key,
@@ -45,7 +46,8 @@ namespace DeportivoApp.Services.Implementations
         {
             return await _context.Reservas
                 .Include(r => r.Espacio)
-                .GroupBy(r => r.Espacio.Nombre)
+                .Where(r => r.Espacio != null)
+                .GroupBy(r => r.Espacio!.Nombre)
                 .Select(g => new ReporteViewModel
                 {
                     Nombre = g.Key,
@@ -60,8 +62,8 @@ namespace DeportivoApp.Services.Implementations
         {
             return await _context.Reservas
                 .Include(r => r.Usuario)
-                .Where(r => r.Estado == "Atendida")
-                .GroupBy(r => r.Usuario.Nombre)
+                .Where(r => r.Estado == "Atendida" && r.Usuario != null)
+                .GroupBy(r => r.Usuario!.Nombre)
                 .Select(g => new ReporteViewModel
                 {
                     Nombre = g.Key,
@@ -76,7 +78,8 @@ namespace DeportivoApp.Services.Implementations
         {
             return await _context.Reservas
                 .Include(r => r.Espacio)
-                .GroupBy(r => r.Espacio.Nombre)
+                .Where(r => r.Espacio != null)
+                .GroupBy(r => r.Espacio!.Nombre)
                 .Select(g => new ReporteViewModel
                 {
                     Nombre = g.Key,

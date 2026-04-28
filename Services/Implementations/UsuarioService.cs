@@ -18,7 +18,6 @@ namespace DeportivoApp.Services.Implementations
         public async Task<List<Usuario>> GetAllAsync()
         {
             return await _context.Usuarios
-                .Include(u => u.Espacios)
                 .ToListAsync();
         }
 
@@ -26,7 +25,6 @@ namespace DeportivoApp.Services.Implementations
         public async Task<Usuario?> GetByIdAsync(int id)
         {
             return await _context.Usuarios
-                .Include(u => u.Espacios)
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 

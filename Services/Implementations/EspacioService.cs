@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using DeportivoApp.Data;
-using DeportivoApp.Helpers;
 using DeportivoApp.Models;
 using DeportivoApp.Services.Interfaces;
 using DeportivoApp.Validators; 
@@ -10,12 +9,10 @@ namespace DeportivoApp.Services.Implementations
     public class EspacioService : IEspacioService
     {
         private readonly MySqlDBContext _context;
-        private readonly EmailHelper _email;
 
-        public EspacioService(MySqlDBContext context, EmailHelper email)
+        public EspacioService(MySqlDBContext context)
         {
             _context = context;
-            _email = email;
         }
 
         // CREATE
@@ -27,20 +24,18 @@ namespace DeportivoApp.Services.Implementations
                 if (!validacion.IsValid)
                     return (false, validacion.Message);
 
-                if (await TieneEspaciosActivasAsync(espacio.UsuarioId))
-                    return (false, "El usuario ya tiene 2 espacios activos");
+                espacio.Nombre = espacio.Nombre.Trim();
+                espacio.Tipo = espacio.Tipo.Trim();
 
-                if (await EstaBloqueadaAsync(espacio.UsuarioId))
-                    return (false, "Usuario bloqueado por inasistencias");
+                var existeDuplicado = await _context.Espacios.AnyAsync(e =>
+                    e.Nombre == espacio.Nombre && e.Tipo == espacio.Tipo
+                );
 
-                if (await HayConflictoHorarioAsync(
-                    espacio.UsuarioId,
-                    espacio.Fecha,
-                    espacio.HoraInicio,
-                    espacio.HoraFin))
-                    return (false, "Conflicto de horario");
+                if (existeDuplicado)
+                    return (false, "Ya existe un espacio con ese nombre y tipo");
 
-                espacio.Estado = "Programada";
+                if (string.IsNullOrWhiteSpace(espacio.Estado))
+                    espacio.Estado = "Disponible";
 
                 await _context.Espacios.AddAsync(espacio); 
                 await _context.SaveChangesAsync();
@@ -58,7 +53,6 @@ namespace DeportivoApp.Services.Implementations
         {
             return await _context.Espacios
                 .Include(e => e.Reservas)
-                .Include(e => e.Usuario)
                 .ToListAsync();
         }
 
@@ -67,7 +61,6 @@ namespace DeportivoApp.Services.Implementations
         {
             return await _context.Espacios
                 .Include(e => e.Reservas)
-                .Include(e => e.Usuario)
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 
@@ -77,6 +70,25 @@ namespace DeportivoApp.Services.Implementations
             var existente = await _context.Espacios.FindAsync(espacio.Id);
             if (existente == null)
                 return (false, "Espacio no encontrado");
+
+            var validacion = EspacioValidator.Validar(espacio);
+            if (!validacion.IsValid)
+                return (false, validacion.Message);
+
+            var nombre = espacio.Nombre.Trim();
+            var tipo = espacio.Tipo.Trim();
+
+            var existeDuplicado = await _context.Espacios.AnyAsync(e =>
+                e.Id != espacio.Id &&
+                e.Nombre == nombre &&
+                e.Tipo == tipo
+            );
+
+            if (existeDuplicado)
+                return (false, "Ya existe un espacio con ese nombre y tipo");
+
+            espacio.Nombre = nombre;
+            espacio.Tipo = tipo;
 
             _context.Entry(existente).CurrentValues.SetValues(espacio);
             await _context.SaveChangesAsync();
@@ -104,53 +116,6 @@ namespace DeportivoApp.Services.Implementations
             espacio.Estado = estado;
             await _context.SaveChangesAsync();
             return true;
-        }
-
-        // USUARIOS
-        public async Task<List<Usuario>> GetUsuariosAsync()
-        {
-            return await _context.Usuarios.ToListAsync();
-        }
-
-        // BLOQUEO
-        public async Task<bool> EstaBloqueadaAsync(int usuarioId)
-        {
-            var inasistencias = await ContarInasistenciasAsync(usuarioId);
-            return inasistencias >= 3;
-        }
-
-        public async Task<int> ContarInasistenciasAsync(int usuarioId)
-        {
-            return await _context.Espacios
-                .CountAsync(e => e.UsuarioId == usuarioId &&
-                                 e.Estado == "No asistió");
-        }
-
-        // VALIDAR CONFLICTO
-        public async Task<bool> HayConflictoHorarioAsync(
-            int usuarioId,
-            DateTime fecha,
-            DateTime inicio,
-            DateTime fin,
-            int? espacioId = null)
-        {
-            return await _context.Espacios.AnyAsync(e =>
-                e.UsuarioId == usuarioId &&
-                e.Fecha.Date == fecha.Date &&
-                e.Id != espacioId &&
-                inicio < e.HoraFin &&
-                fin > e.HoraInicio
-            );
-        }
-
-        // VALIDAR LIMITE
-        public async Task<bool> TieneEspaciosActivasAsync(int usuarioId)
-        {
-            var count = await _context.Espacios
-                .CountAsync(e => e.UsuarioId == usuarioId &&
-                                 e.Estado == "Programada");
-
-            return count >= 2;
         }
     }
 } 
