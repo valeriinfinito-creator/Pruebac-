@@ -1,0 +1,26 @@
+@model List<DeportivoApp.ViewModels.ReporteViewModel>
+
+@{
+    ViewData["Title"] = "Reportes";
+}
+
+<h2>📊 Reportes Generales</h2>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Nombre</th>
+        <th>Total</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Nombre</td>
+            <td>@item.Total</td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -1,0 +1,35 @@
+@model DeportivoApp.Models.Usuario
+
+@{
+    ViewData["Title"] = "Nuevo usuario";
+}
+
+<h2>➕ Registrar usuario</h2>
+
+<form asp-action="Create" method="post" class="card card-wow p-4">
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Documento</label>
+        <input asp-for="Documento" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Teléfono</label>
+        <input asp-for="Telefono" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-wow">
+        💾 Guardar
+    </button>
+
+</form>

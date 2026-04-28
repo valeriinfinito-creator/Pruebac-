@@ -1,0 +1,36 @@
+@model DeportivoApp.Models.Usuario
+
+@{
+    ViewData["Title"] = "Eliminar usuario";
+}
+
+<h2 class="text-danger">🗑 Eliminar usuario</h2>
+
+<div class="card card-wow p-4">
+
+    <h5>⚠️ ¿Estás seguro de eliminar este usuario?</h5>
+
+    <hr />
+
+    <p><strong>Nombre:</strong> @Model.Nombre</p>
+    <p><strong>Documento:</strong> @Model.Documento</p>
+    <p><strong>Teléfono:</strong> @Model.Telefono</p>
+    <p><strong>Email:</strong> @Model.Email</p>
+
+    <hr />
+
+    <form asp-action="Delete" method="post">
+
+        <input type="hidden" asp-for="Id" />
+
+        <button type="submit" class="btn btn-danger">
+            🗑 Sí, eliminar
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            ❌ Cancelar
+        </a>
+
+    </form>
+
+</div>

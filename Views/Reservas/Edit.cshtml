@@ -1,0 +1,63 @@
+@model DeportivoApp.ViewModels.ReservaCreateViewModel
+
+@{
+    ViewData["Title"] = "Editar Reserva";
+}
+
+<h2>✏️ Editar Reserva</h2>
+
+<form asp-action="Edit" method="post" class="card card-wow p-4">
+
+    <!-- ID oculto -->
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label>Usuario</label>
+        <select asp-for="UsuarioId"
+                asp-items="Model.Usuarios"
+                class="form-select">
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Espacio</label>
+        <select asp-for="EspacioId"
+                asp-items="Model.Espacios"
+                class="form-select">
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha</label>
+        <input asp-for="Fecha" type="date" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Hora Inicio</label>
+        <input asp-for="HoraInicio" type="time" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Hora Fin</label>
+        <input asp-for="HoraFin" type="time" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Estado</label>
+        <select asp-for="Estado" class="form-select">
+            <option>Programada</option>
+            <option>Cancelada</option>
+            <option>Atendida</option>
+            <option>No asistió</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-wow">
+        💾 Actualizar
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+
+</form>

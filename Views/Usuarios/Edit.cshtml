@@ -1,0 +1,37 @@
+@model DeportivoApp.Models.Usuario
+
+@{
+    ViewData["Title"] = "Editar usuario";
+}
+
+<h2>✏️ Editar usuario</h2>
+
+<form asp-action="Edit" method="post" class="card card-wow p-4">
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Documento</label>
+        <input asp-for="Documento" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Teléfono</label>
+        <input asp-for="Telefono" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-wow">
+        💾 Actualizar
+    </button>
+
+</form>

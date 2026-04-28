@@ -1,0 +1,36 @@
+@model DeportivoApp.Models.Usuario
+
+@{
+    ViewData["Title"] = "Detalle usuario";
+}
+
+<h2 class="mb-3">👤 Detalle del usuario</h2>
+
+<div class="card card-wow p-4">
+
+    <h5>Nombre</h5>
+    <p>@Model.Nombre</p>
+
+    <h5>Documento</h5>
+    <p>@Model.Documento</p>
+
+    <h5>Teléfono</h5>
+    <p>@Model.Telefono</p>
+
+    <h5>Email</h5>
+    <p>@Model.Email</p>
+
+    <hr />
+
+    <a asp-action="Edit"
+       asp-route-id="@Model.Id"
+       class="btn btn-primary">
+        ✏️ Editar
+    </a>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        🔙 Volver
+    </a>
+
+</div>
